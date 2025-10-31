@@ -8,6 +8,8 @@ out  = BASE / "data" / "ads.json"
 # lit la première feuille "ads" par défaut
 df = pd.read_excel(xlsx).fillna("")
 
+df.columns = [str(c).strip().lower() for c in df.columns]
+
 # garder uniquement les lignes publiées
 def is_true(v): return str(v).strip().lower() in ("true","1","yes","y","oui","vrai")
 if "publie" in df.columns:
@@ -16,7 +18,7 @@ if "publie" in df.columns:
 def collect_images(row, maxn=10):
     imgs = []
     for i in range(1, maxn+1):
-        col = f"image{i}" if f"image{i}" in row.index else None
+        col = f"IMAGE{i}" if f"IMAGE{i}" in row.index else None
         if col:
             val = str(row[col]).strip()
             if val and val.lower() != "nan":

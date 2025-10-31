@@ -5,14 +5,325 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Mes Annonces</title>
   <style>
-    body{font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;margin:0;padding:2rem;background:#f6f7f9}
-    .card{max-width:720px;margin:auto;background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:24px}
+    :root{
+      --bg:#f6f7f9; --card:#fff; --muted:#6b7280; --border:#e5e7eb;
+      --brand:#1f2937; --brand-2:#111827; --accent:#3730a3;
+    }
+    *{box-sizing:border-box}
+    body{font-family:system-ui,"Segoe UI",Roboto,Arial,sans-serif;margin:0;background:var(--bg);color:#0f172a}
+    header{position:sticky;top:0;background:linear-gradient(#fff, #fffcc0 0, #fff);border-bottom:1px solid var(--border);padding:14px 16px;z-index:10}
+    .container{max-width:1100px;margin:auto;padding:16px}
+    h1{margin:0 0 6px 0;font-size:22px}
+    .controls{display:flex;gap:8px;flex-wrap:wrap}
+    .controls input,.controls select{
+      padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:#fff;min-width:180px
+    }
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;cursor:pointer;transition:transform .08s ease, box-shadow .08s ease}
+    .card:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(0,0,0,.06)}
+    .thumb{width:100%;aspect-ratio:16/10;object-fit:cover;background:#f3f4f6}
+    .pad{padding:12px}
+    .title{margin:0 0 6px 0;font-size:16px;color:var(--brand-2);line-height:1.2}
+    .price{margin:0;font-weight:700;color:#0b5;letter-spacing:.2px}
+    .meta{margin-top:6px;font-size:12px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap}
+    .muted{color:var(--muted)}
+    .footer{padding:24px 0;color:var(--muted);text-align:center}
+
+    /* Modal */
+    .backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;place-items:center;z-index:50}
+    .backdrop.show{display:grid}
+    .modal{position:relative;background:#fff;max-width:980px;width:96%;max-height:92vh;overflow:auto;border-radius:14px;padding:16px;box-shadow:0 10px 40px rgba(0,0,0,.35)}
+    .close{position:absolute;right:14px;top:10px;font-size:28px;background:none;border:0;cursor:pointer;line-height:1}
+    .gallery{position:relative;display:grid;place-items:center;background:#f3f4f6;border-radius:10px;aspect-ratio:16/9;overflow:hidden}
+    .gallery img{max-width:100%;max-height:70vh;object-fit:contain;background:#fff}
+    .nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.5);color:#fff;border:0;border-radius:999px;width:38px;height:38px;cursor:pointer}
+    .prev{left:8px}.next{right:8px}
+    .detail{display:grid;grid-template-columns:1fr;gap:14px;margin-top:12px}
+    @media(min-width:860px){ .detail{grid-template-columns:2fr 1fr} }
+    .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+    .tag{background:#eef2ff;color:#3730a3;border-radius:999px;padding:4px 10px;font-size:12px}
+    .desc{white-space:pre-wrap;line-height:1.4}
+    .srch-empty{padding:40px;text-align:center;color:var(--muted)}
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>Mes Annonces</h1>
-    <p>Si tu lis ceci en local, l’environnement est prêt ✅</p>
+  <header>
+    <div class="container">
+      <h1>Mes Annonces</h1>
+      <div class="controls">
+        <input id="q" type="search" placeholder="Rechercher (titre, description, marque…)" />
+        <select id="sort">
+          <option value="recent">Tri: Plus récent</option>
+          <option value="prix-asc">Tri: Prix croissant</option>
+          <option value="prix-desc">Tri: Prix décroissant</option>
+          <option value="titre-asc">Tri: Titre A→Z</option>
+        </select>
+        <select id="cat">
+          <option value="">Toutes catégories</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div id="grid" class="grid" aria-live="polite"></div>
+    <p id="empty" class="srch-empty" hidden>Aucune annonce ne correspond à votre recherche.</p>
+  </main>
+
+  <div class="footer">
+    <div class="container">
+      <span class="muted">Fait avec ❤️ — Local + GitHub Pages</span>
+    </div>
   </div>
+
+  <!-- Modal détail -->
+  <div id="detail-backdrop" class="backdrop">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="detail-title">
+      <button class="close" aria-label="Fermer" onclick="closeDetail()">×</button>
+      <div class="gallery">
+        <button class="nav prev" onclick="prevImg()">‹</button>
+        <img id="detail-img" alt="">
+        <button class="nav next" onclick="nextImg()">›</button>
+      </div>
+      <div class="detail">
+        <section>
+          <h2 id="detail-title" style="margin:10px 0 6px 0;"></h2>
+          <p class="price" id="detail-price" style="margin:0 0 8px 0;"></p>
+          <div class="tags" id="detail-tags"></div>
+          <h3 style="margin:16px 0 6px 0;font-size:14px;color:#374151;">Description</h3>
+          <p id="detail-desc" class="desc"></p>
+        </section>
+        <aside>
+          <h3 style="margin:10px 0 8px 0;font-size:14px;color:#374151;">Détails</h3>
+          <ul id="detail-list" style="margin:0;padding-left:18px;line-height:1.6"></ul>
+        </aside>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --------- Helpers
+    const $ = sel => document.querySelector(sel);
+    const fmtPrice = (p, cur='CHF') => (p==null || p==='') ? '' :
+      new Intl.NumberFormat('fr-CH', { style:'currency', currency:cur }).format(Number(p));
+    const escapeHTML = s => (s??'').toString().replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const imgURL = name => name ? `images/${encodeURIComponent(name)}` : placeholderDataURL();
+    const placeholderDataURL = () => 'data:image/svg+xml;utf8,' + encodeURIComponent(
+      `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600">
+        <rect width="100%" height="100%" fill="#e5e7eb"/>
+        <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle"
+              fill="#9ca3af" font-family="sans-serif" font-size="18">Aucune image</text>
+      </svg>`);
+
+    const debounce = (fn, ms=200) => { let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), ms);} };
+
+    // --------- State
+    let RAW = [];
+    let DATA = [];
+    let VIEW = [];
+    let CURRENT = { ad:null, idx:0 };
+
+    // --------- Fetch data
+    async function loadData(){
+      const res = await fetch('data/ads.json', { cache: 'no-store' });
+      if(!res.ok) throw new Error('Impossible de charger data/ads.json');
+      const arr = await res.json();
+
+      // Normalisation légère
+      RAW = (Array.isArray(arr)?arr:[]).map((x,i)=>{
+        // images: accepte image1..N et/ou images[]
+        let imgs = [];
+        if (Array.isArray(x.images)) imgs = x.images;
+        else {
+          // récupère IMAGE1/IMAGE2/...
+          const lower = Object.fromEntries(Object.entries(x).map(([k,v])=>[String(k).toLowerCase(), v]));
+          for(let n=1;n<=20;n++){
+            const v = lower['image'+n];
+            if(v!=null && String(v).trim() && String(v).toLowerCase()!=='nan') imgs.push(String(v).trim());
+          }
+          const col = lower['images'];
+          if(!imgs.length && col!=null){
+            const parts = String(col).split(/[;,|]/).map(s=>s.trim()).filter(Boolean);
+            imgs.push(...parts);
+          }
+        }
+        imgs = imgs.map(s => s ? s.toString().trim() : '').filter(Boolean);
+
+        return {
+          id: x.id ?? (i+1),
+          titre: x.titre ?? x.TITRE ?? '',
+          description: x.description ?? x.desc ?? '',
+          categorie: x.categorie ?? x.category ?? '',
+          marque: x.marque ?? x.brand ?? '',
+          modele: x.modele ?? x.model ?? '',
+          prix: x.prix ?? x.Prix ?? '',
+          devise: x.devise ?? 'CHF',
+          images: imgs,
+          ...x
+        };
+      });
+
+      DATA = RAW;
+      fillCategories();
+      applyFilters();
+    }
+
+    function fillCategories(){
+      const cats = Array.from(new Set(DATA.map(x => (x.categorie||'').toString().trim()).filter(Boolean))).sort((a,b)=>a.localeCompare(b,'fr'));
+      const sel = $('#cat');
+      sel.innerHTML = '<option value="">Toutes catégories</option>' + cats.map(c=>`<option value="${escapeHTML(c)}">${escapeHTML(c)}</option>`).join('');
+    }
+
+    // --------- Render list
+    function applyFilters(){
+      const q = $('#q').value.trim().toLowerCase();
+      const cat = $('#cat').value;
+      const sort = $('#sort').value;
+
+      VIEW = DATA.filter(x=>{
+        if(cat && (x.categorie||'') !== cat) return false;
+        if(!q) return true;
+        const hay = [
+          x.titre, x.description, x.categorie, x.marque, x.modele
+        ].map(v => (v||'').toString().toLowerCase()).join(' ');
+        return hay.includes(q) || q.split(/\s+/).every(tok => hay.includes(tok));
+      });
+
+      // tri
+      if(sort==='prix-asc') VIEW.sort((a,b)=>(+a.prix||Infinity) - (+b.prix||Infinity));
+      else if(sort==='prix-desc') VIEW.sort((a,b)=>(+b.prix||-Infinity) - (+a.prix||-Infinity));
+      else if(sort==='titre-asc') VIEW.sort((a,b)=>String(a.titre||'').localeCompare(String(b.titre||''),'fr'));
+      else /* recent par défaut */ VIEW.sort((a,b)=> (b.id??0) - (a.id??0));
+
+      renderGrid();
+    }
+
+    function renderGrid(){
+      const grid = $('#grid');
+      const empty = $('#empty');
+
+      if(!VIEW.length){
+        grid.innerHTML = '';
+        empty.hidden = false;
+        return;
+      }
+      empty.hidden = true;
+
+      grid.innerHTML = VIEW.map(cardHTML).join('');
+    }
+
+    function cardHTML(x){
+      const first = x.images?.[0] ? imgURL(x.images[0]) : placeholderDataURL();
+      return `
+        <article class="card" role="button" tabindex="0"
+                 onclick="openDetail(${x.id})"
+                 onkeydown="if(event.key==='Enter') openDetail(${x.id})"
+                 aria-label="${escapeHTML(x.titre || 'Détail')}">
+          <img class="thumb" src="${first}" alt="${escapeHTML(x.titre || '')}" loading="lazy">
+          <div class="pad">
+            <h3 class="title">${escapeHTML(x.titre || '')}</h3>
+            <p class="price">${fmtPrice(x.prix, x.devise)}</p>
+            <div class="meta">
+              ${x.categorie ? `<span>${escapeHTML(x.categorie)}</span>` : ''}
+              ${x.marque ? `<span>${escapeHTML(x.marque)}</span>` : ''}
+              ${x.modele ? `<span>${escapeHTML(x.modele)}</span>` : ''}
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    // --------- Modal detail
+    function openDetail(id){
+      const ad = DATA.find(d => d.id == id);
+      if(!ad) return;
+
+      CURRENT.ad = ad;
+      CURRENT.idx = 0;
+      renderDetail();
+
+      const bd = $('#detail-backdrop');
+      bd.classList.add('show');
+      document.body.style.overflow = 'hidden';
+      location.hash = `ad-${ad.id}`;
+    }
+
+    function closeDetail(){
+      $('#detail-backdrop').classList.remove('show');
+      document.body.style.overflow = '';
+      if(location.hash.startsWith('#ad-')) {
+        history.pushState('', document.title, location.pathname + location.search);
+      }
+    }
+
+    function renderDetail(){
+      const ad = CURRENT.ad; if(!ad) return;
+      const imgs = Array.isArray(ad.images) && ad.images.length ? ad.images : [null];
+      const name = imgs[CURRENT.idx];
+      const src = name ? imgURL(name) : placeholderDataURL();
+
+      const elImg = $('#detail-img');
+      elImg.src = src;
+      elImg.alt = ad.titre || '';
+
+      $('#detail-title').textContent = ad.titre || '';
+      $('#detail-price').textContent = fmtPrice(ad.prix, ad.devise);
+      $('#detail-desc').textContent = ad.description || ad.desc || '';
+
+      const tags = [ad.categorie, ad.marque, ad.modele].filter(Boolean).map(t=>`<span class="tag">${escapeHTML(t)}</span>`).join('');
+      $('#detail-tags').innerHTML = tags;
+
+      const details = [];
+      for (const key of ['etat','ville','disponibilite','reference','vendeur']) {
+        if(ad[key]) details.push(`<li><strong>${escapeHTML(key)}:</strong> ${escapeHTML(String(ad[key]))}</li>`);
+      }
+      $('#detail-list').innerHTML = details.join('');
+    }
+
+    function nextImg(){
+      const imgs = CURRENT.ad?.images || [];
+      if(!imgs.length) return;
+      CURRENT.idx = (CURRENT.idx + 1) % imgs.length;
+      renderDetail();
+    }
+    function prevImg(){
+      const imgs = CURRENT.ad?.images || [];
+      if(!imgs.length) return;
+      CURRENT.idx = (CURRENT.idx - 1 + imgs.length) % imgs.length;
+      renderDetail();
+    }
+
+    // --------- Initialisation
+    window.addEventListener('DOMContentLoaded', ()=>{
+      // S'assurer que la modale est fermée au départ
+      $('#detail-backdrop').classList.remove('show');
+      
+      // Attacher les événements UI
+      $('#q').addEventListener('input', debounce(applyFilters, 200));
+      $('#sort').addEventListener('change', applyFilters);
+      $('#cat').addEventListener('change', applyFilters);
+
+      // interactions backdrop + clavier
+      $('#detail-backdrop').addEventListener('click', (e)=>{
+        if(e.target.id === 'detail-backdrop') closeDetail();
+      });
+      
+      window.addEventListener('keydown', (e)=>{
+        const isOpen = $('#detail-backdrop').classList.contains('show');
+        if(e.key === 'Escape' && isOpen){ closeDetail(); }
+        if(isOpen && (e.key === 'ArrowRight' || e.key === 'ArrowDown')) nextImg();
+        if(isOpen && (e.key === 'ArrowLeft'  || e.key === 'ArrowUp'))   prevImg();
+      });
+
+      // Charger les données
+      loadData().then(()=>{
+        const m = location.hash.match(/^#ad-(.+)$/);
+        if(m) openDetail(parseInt(m[1]));
+      }).catch(err=>{
+        console.error(err);
+        $('#grid').innerHTML = '<p class="srch-empty">Erreur lors du chargement de data/ads.json</p>';
+      });
+    });
+  </script>
 </body>
 </html>
