@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ad detail</title>
+  <link rel="stylesheet" href="../styles/main.css">
+  <link rel="stylesheet" href="../styles/detail.css">
+</head>
+<body>
+  <div data-include="../components/header.html"></div>
+
+  <main class="container my-4">
+    <h1 id="title" class="h4 mb-3"></h1>
+    <p class="h6 text-success" id="price"></p>
+
+    <div class="ratio ratio-16x9 bg-light mb-3">
+      <img id="hero" class="object-fit-contain" alt="">
+    </div>
+
+    <div class="row g-3">
+      <div class="col-lg-8">
+        <h2 class="h6 text-secondary">Description</h2>
+        <p id="desc"></p>
+        <div id="thumbs" class="d-flex flex-wrap gap-2"></div>
+      </div>
+      <div class="col-lg-4">
+        <h2 class="h6 text-secondary">Details</h2>
+        <ul id="meta"></ul>
+      </div>
+    </div>
+  </main>
+
+  <div data-include="../components/footer.html"></div>
+
+  <script type="module" src="../scripts/detail.js"></script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>About — Sell My Tools</title>
+    <meta name="description" content="Sell My Tools — a simple, trusted marketplace to buy and sell new and used tools locally."/>
+    <style>
+        :root{
+            --bg:#f7f8fb;
+            --card:#fff;
+            --accent:#0b74de;
+            --muted:#6b7280;
+            --radius:12px;
+            --max:900px;
+            --gap:20px;
+            font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            color:#0f1722;
+        }
+        *{box-sizing:border-box}
+        body{margin:0;background:linear-gradient(180deg,#f7f8fb 0%, #ffffff 100%);padding:32px;display:flex;justify-content:center}
+        .wrap{width:100%;max-width:var(--max)}
+        header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+        .brand{display:flex;gap:12px;align-items:center;text-decoration:none;color:inherit}
+        .logo{
+            width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#7cc3ff);
+            display:grid;place-items:center;color:white;font-weight:700;font-size:18px;box-shadow:0 6px 18px rgba(11,116,222,0.12)
+        }
+        nav a{color:var(--muted);text-decoration:none;margin-left:14px;font-size:14px}
+        main{background:var(--card);border-radius:var(--radius);padding:28px;box-shadow:0 8px 30px rgba(15,23,34,0.06)}
+        .hero{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+        .hero h1{margin:0;font-size:28px}
+        .hero p{margin:0;color:var(--muted);font-size:15px}
+        .cta-row{margin-top:12px;display:flex;gap:12px}
+        .btn{
+            display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;text-decoration:none;font-weight:600;font-size:14px;
+            border:1px solid transparent;cursor:pointer;
+        }
+        .btn-primary{background:var(--accent);color:white;box-shadow:0 6px 18px rgba(11,116,222,0.12)}
+        .btn-ghost{background:transparent;color:var(--accent);border-color:rgba(11,116,222,0.12)}
+        .grid{display:grid;grid-template-columns:1fr 320px;gap:var(--gap);align-items:start}
+        @media (max-width:880px){.grid{grid-template-columns:1fr} .hero h1{font-size:22px}}
+        .card{background:var(--card);border-radius:12px;padding:16px;box-shadow:0 4px 20px rgba(15,23,34,0.04)}
+        .muted{color:var(--muted);font-size:14px}
+        .list{display:grid;gap:10px;margin-top:12px}
+        .list-item{display:flex;gap:12px;align-items:flex-start}
+        .icon{
+            min-width:44px;height:44px;border-radius:10px;background:#f1f5f9;display:grid;place-items:center;color:var(--accent);font-weight:700
+        }
+        .team-grid{display:flex;flex-direction:column;gap:10px}
+        .person{display:flex;gap:12px;align-items:center}
+        .avatar{width:56px;height:56px;border-radius:10px;background:#e6eefc;display:grid;place-items:center;font-weight:700;color:var(--accent)}
+        footer{margin-top:18px;text-align:center;color:var(--muted);font-size:13px}
+        a.sr-only{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
+    </style>
+</head>
+<body>
+    <div class="wrap" role="main">
+        <header>
+            <a href="/index.html" class="brand" aria-label="Sell My Tools home">
+                <div class="logo">SMT</div>
+                <div>
+                    <strong>Sell My Tools</strong><div style="font-size:12px;color:var(--muted)">Buy. Sell. Reuse.</div>
+                </div>
+            </a>
+            <nav aria-label="Main navigation">
+                <a href="/listings.html">Listings</a>
+                <a href="/sell.html">Sell</a>
+                <a href="/contact.html">Contact</a>
+            </nav>
+        </header>
+
+        <main>
+            <section class="hero" aria-labelledby="about-heading">
+                <h1 id="about-heading">About Sell My Tools</h1>
+                <p>We make it easy and safe to buy and sell new and used tools locally — from power drills to heavy equipment. Trusted by hobbyists and pros alike.</p>
+                <div class="cta-row">
+                    <a class="btn btn-primary" href="/sell.html">List a tool</a>
+                    <a class="btn btn-ghost" href="/listings.html">Browse listings</a>
+                </div>
+            </section>
+
+            <div class="grid" role="region" aria-label="About content">
+                <section>
+                    <article class="card" aria-labelledby="mission">
+                        <h2 id="mission" style="margin-top:0">Our mission</h2>
+                        <p class="muted">Reduce waste, save money, and connect local buyers with sellers. We focus on simple listings, clear pricing, and secure communication so transactions are fast and reliable.</p>
+
+                        <div class="list" aria-hidden="false">
+                            <div class="list-item">
+                                <div class="icon">1</div>
+                                <div>
+                                    <strong>Simple listings</strong>
+                                    <div class="muted">Create a listing in minutes with photos, condition, and delivery options.</div>
+                                </div>
+                            </div>
+
+                            <div class="list-item">
+                                <div class="icon">2</div>
+                                <div>
+                                    <strong>Local focus</strong>
+                                    <div class="muted">Find tools near you to avoid shipping and meet in safe public locations.</div>
+                                </div>
+                            </div>
+
+                            <div class="list-item">
+                                <div class="icon">3</div>
+                                <div>
+                                    <strong>Trusted community</strong>
+                                    <div class="muted">Ratings and simple dispute guidance to keep transactions fair.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="card" style="margin-top:16px" aria-labelledby="how">
+                        <h3 id="how" style="margin-top:0">How it works</h3>
+                        <ol class="muted" style="padding-left:18px">
+                            <li>Create a free listing with photos and description.</li>
+                            <li>Communicate securely through our messaging system.</li>
+                            <li>Meet locally or arrange shipping and complete the sale.</li>
+                        </ol>
+                    </article>
+                </section>
+
+                <aside>
+                    <div class="card" aria-labelledby="team">
+                        <h3 id="team" style="margin-top:0">Team & values</h3>
+                        <div class="team-grid">
+                            <div class="person">
+                                <div class="avatar" aria-hidden="true">AL</div>
+                                <div>
+                                    <strong>Alice L.</strong>
+                                    <div class="muted">Founder — product & operations</div>
+                                </div>
+                            </div>
+
+                            <div class="person">
+                                <div class="avatar" aria-hidden="true">RM</div>
+                                <div>
+                                    <strong>R. Martinez</strong>
+                                    <div class="muted">Engineering — platform and security</div>
+                                </div>
+                            </div>
+
+                            <div class="person">
+                                <div class="avatar" aria-hidden="true">JS</div>
+                                <div>
+                                    <strong>J. Singh</strong>
+                                    <div class="muted">Community & support</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p style="margin-top:12px" class="muted">We value safety, transparency, and sustainability. If you'd like to partner or join the team, <a href="/contact.html">get in touch</a>.</p>
+                    </div>
+
+                    <div class="card" style="margin-top:14px">
+                        <h4 style="margin-top:0">Contact</h4>
+                        <p class="muted" style="margin:0 0 8px 0">Email: <a href="mailto:hello@sellmytools.example">hello@sellmytools.example</a></p>
+                        <p class="muted" style="margin:0 0 8px 0">Follow: <a href="#" class="muted">Twitter</a> · <a href="#" class="muted">Instagram</a></p>
+                        <a class="btn btn-ghost" href="/contact.html">Send a message</a>
+                    </div>
+                </aside>
+            </div>
+
+            <footer>
+                <small>&copy; <span id="year"></span> Sell My Tools. All rights reserved.</small>
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        // small enhancements
+        document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>

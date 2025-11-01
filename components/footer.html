@@ -1,0 +1,9 @@
+<footer class="border-top">
+  <div class="container py-4 text-muted small">
+    © <span id="year"></span> My Ads. All rights reserved.
+  </div>
+  <script>
+    document.currentScript.parentElement.querySelector('#year').textContent =
+      new Date().getFullYear();
+  </script>
+</footer>
